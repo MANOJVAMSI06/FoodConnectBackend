@@ -1,11 +1,21 @@
-# Use official OpenJDK 17 image
-FROM eclipse-temurin:17-jdk
+# Use Gradle image to build the project
+FROM gradle:8.4.0-jdk17 AS build
 
-# Set the working directory in the container
+# Copy everything to /app
+COPY --chown=gradle:gradle . /app
+
 WORKDIR /app
 
-# Copy the JAR file from local to container
-COPY build/libs/FoodConnectBackend-0.0.1-SNAPSHOT.jar app.jar
+# Build the Spring Boot app
+RUN gradle build --no-daemon
 
-# Run the JAR file
+# Use OpenJDK for running the app
+FROM eclipse-temurin:17-jdk
+
+WORKDIR /app
+
+# Copy the generated jar from the build image
+COPY --from=build /app/build/libs/*.jar app.jar
+
+# Run the jar
 CMD ["java", "-jar", "app.jar"]
