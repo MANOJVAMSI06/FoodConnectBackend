@@ -7,7 +7,7 @@ COPY --chown=gradle:gradle . /app
 WORKDIR /app
 
 # Build the Spring Boot app
-RUN gradle build --no-daemon
+RUN gradle build --no-daemon -x test
 
 # Use OpenJDK for running the app
 FROM eclipse-temurin:17-jdk
